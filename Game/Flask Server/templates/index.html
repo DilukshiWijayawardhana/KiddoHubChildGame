@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+    <style>
+        #video_feed {
+            margin: auto;
+            display: block;
+            margin-top: 20px;
+        }
+        #face_recognition {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        #location_select {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function startRecognition() {
+            fetch('/start_recognition', { method: 'POST' })
+                .then(response => response.text())
+                .then(message => console.log(message))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function endRecognition() {
+            fetch('/end_recognition', { method: 'POST' })
+                .then(response => response.text())
+                .then(message => console.log(message))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function sendLocation() {
+            var location = document.getElementById('location').value;
+            fetch('/send_to_db', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'location=' + location
+            })
+            .then(response => response.text())
+            .then(message => console.log(message))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Face Recognition</h1>
+    <div>
+        <button onclick="redirectToLocalhost()">View Progrees</button>
+
+        <script>
+          function redirectToLocalhost() {
+            window.location.href = 'http://localhost:3000/child-location-analysis';
+          }
+        </script></div>
+    <div>
+        <img id="video_feed" src="{{ url_for('video_feed') }}" alt="Video Feed">
+    </div>
+    <div id="face_recognition">
+        {% for face in face_locations_with_names %}
+            <p>{{ face[1] }}</p>
+        {% endfor %}
+    </div>
+    <div id="buttons">
+        <button onclick="startRecognition()">Start Recognition</button>
+        <button onclick="endRecognition()">End Recognition</button>
+    </div>
+    <div id="location_select">
+        <label for="location">Select Location:</label>
+        <select id="location">
+            <option value="Location 1">Location 1</option>
+            <option value="Location 2">Location 2</option>
+            <option value="Location 3">Location 3</option>
+        </select>
+        <button onclick="sendLocation()">Set Location</button>
+    </div>
+</body>
+</html>
